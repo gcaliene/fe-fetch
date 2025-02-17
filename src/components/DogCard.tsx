@@ -23,11 +23,15 @@ const DogCard = ({ dog, isFavorite, onToggleFavorite }: DogCardProps) => {
                 position="absolute"
                 top={2}
                 right={2}
-                colorScheme={isFavorite ? "red" : "gray"}
+                colorScheme="red"
                 onClick={() => onToggleFavorite(dog.id)}
-                bg="white"
+                bg={isFavorite ? "red.500" : "white"}
+                color={isFavorite ? "white" : "red.500"}
                 opacity={0.8}
-                _hover={{ opacity: 1 }}
+                _hover={{ 
+                    opacity: 1,
+                    bg: isFavorite ? "red.600" : "white",
+                }}
             />
             <CardBody>
                 <Stack spacing={2}>
