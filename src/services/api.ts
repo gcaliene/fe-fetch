@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Dog, SearchResponse, Match } from '../types';
 
 const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
@@ -6,19 +6,38 @@ const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
 const api = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
-export const login = async (name: string, email: string) => {
-    return api.post('/auth/login', { name, email });
+api.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
+export const login = async (name: string, email: string): Promise<boolean> => {
+    try {
+        await api.post('/auth/login', { name, email });
+        return true;
+    } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+    }
 };
 
 export const logout = async () => {
-    return api.post('/auth/logout');
+    await api.post('/auth/logout');
 };
 
 export const getBreeds = async (): Promise<string[]> => {
-    const response = await api.get('/dogs/breeds');
-    return response.data;
+    const { data } = await api.get('/dogs/breeds');
+    return data;
 };
 
 export const searchDogs = async (params: {
@@ -30,16 +49,16 @@ export const searchDogs = async (params: {
     from?: string;
     sort?: string;
 }): Promise<SearchResponse> => {
-    const response = await api.get('/dogs/search', { params });
-    return response.data;
+    const { data } = await api.get('/dogs/search', { params });
+    return data;
 };
 
 export const getDogs = async (dogIds: string[]): Promise<Dog[]> => {
-    const response = await api.post('/dogs', dogIds);
-    return response.data;
+    const { data } = await api.post('/dogs', dogIds);
+    return data;
 };
 
 export const generateMatch = async (dogIds: string[]): Promise<Match> => {
-    const response = await api.post('/dogs/match', dogIds);
-    return response.data;
+    const { data } = await api.post('/dogs/match', dogIds);
+    return data;
 };

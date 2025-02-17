@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { login } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
@@ -21,6 +22,20 @@ const validationSchema = Yup.object({
 
 const Login = () => {
     const navigate = useNavigate();
+    const { setIsAuthenticated } = useAuth();
+
+    const handleSubmit = async (values: any, { setSubmitting }: any) => {
+        try {
+            await login(values.name, values.email);
+            setIsAuthenticated(true);
+            navigate('/search');
+        } catch (error) {
+            console.error('Login failed:', error);
+            setIsAuthenticated(false);
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <Flex 
@@ -49,16 +64,7 @@ const Login = () => {
                     <Formik
                         initialValues={{ name: '', email: '' }}
                         validationSchema={validationSchema}
-                        onSubmit={async (values, { setSubmitting }) => {
-                            try {
-                                await login(values.name, values.email);
-                                navigate('/search');
-                            } catch (error) {
-                                console.error('Login failed:', error);
-                            } finally {
-                                setSubmitting(false);
-                            }
-                        }}
+                        onSubmit={handleSubmit}
                     >
                         {({ values, errors, touched, handleChange, isSubmitting, }) => (
                             <Form>
