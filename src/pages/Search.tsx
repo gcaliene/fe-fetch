@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Container,
-    Box,
-    Heading,
-    Button,
-    Grid,
-    Select,
-    HStack,
-    VStack,
-    Text,
-    useToast,
-    Flex,
-    Badge,
-} from '@chakra-ui/react';
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
+import { Container, VStack, Flex, useToast } from '@chakra-ui/react';
 import { getBreeds, searchDogs, getDogs, logout } from '../services/api';
-import DogCard from '../components/DogCard';
 import { Dog } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SearchHeader from '../components/SearchHeader';
+import SearchControls from '../components/SearchControls';
+import DogGrid from '../components/DogGrid';
+import Pagination from '../components/Pagination';
 
 interface PageInfo {
     next: string | null;
@@ -33,7 +22,7 @@ const Search = () => {
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [isLoading, setIsLoading] = useState();
+    const [isLoading, setIsLoading] = useState(true);
     const [cursor, setCursor] = useState<string | null>(null);
     const [pageInfo, setPageInfo] = useState<PageInfo>({ next: null, prev: null });
     const [currentPage, setCurrentPage] = useState(1);
@@ -149,123 +138,38 @@ const Search = () => {
             align="center"
             justify="center"
             bg="gray.50"
-            position="fixed"
-            top="0"
-            left="0"
         >
-            {isLoading ? <LoadingSpinner message="Fetching dogs..." /> :
-                <Container
-                    maxW="1200px"
-                    py={6}
-                    px={4}
-                >
+            {isLoading ? <LoadingSpinner message="Fetching dogs..." /> : (
+                <Container maxW="1200px" py={6} px={4}>
                     <VStack spacing={8} align="stretch" width="100%">
-                        <Flex
-                            justify="space-between"
-                            align="center"
-                            direction={{ base: "column", md: "row" }}
-                            gap={4}
-                        >
-                            <Heading size="lg">Find Your Perfect Dog</Heading>
-                            <Button variant="outline" onClick={handleLogout}>
-                                Logout
-                            </Button>
-                        </Flex>
+                        <SearchHeader onLogout={handleLogout} />
+                        
+                        <SearchControls
+                            breeds={breeds}
+                            selectedBreeds={selectedBreeds}
+                            sortOrder={sortOrder}
+                            favoritesCount={favorites.size}
+                            onBreedChange={handleBreedChange}
+                            onSortOrderChange={handleSortOrderChange}
+                            onGenerateMatch={handleMatch}
+                        />
 
-                        <Box width="100%">
-                            <VStack spacing={4} align="stretch">
-                                <Select
-                                    multiple
-                                    size="lg"
-                                    value={selectedBreeds}
-                                    onChange={handleBreedChange}
-                                    height="auto"
-                                    minHeight="100px"
-                                >
-                                    {breeds.map((breed) => (
-                                        <option key={breed} value={breed}>
-                                            {breed}
-                                        </option>
-                                    ))}
-                                </Select>
+                        <DogGrid
+                            dogs={dogs}
+                            favorites={favorites}
+                            onToggleFavorite={handleToggleFavorite}
+                        />
 
-                                <HStack
-                                    spacing={4}
-                                    wrap="wrap"
-                                    justify={{ base: "center", md: "flex-start" }}
-                                    gap={4}
-                                >
-                                    <Button
-                                        leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                        onClick={handleSortOrderChange}
-                                        size={{ base: "sm", md: "md" }}
-                                    >
-                                        {sortOrder === 'asc' ? 'Sort by Breed (A → Z)' : 'Sort by Breed (Z → A)'}
-                                    </Button>
-
-                                    <Button
-                                        colorScheme="blue"
-                                        onClick={handleMatch}
-                                        isDisabled={favorites.size === 0}
-                                        size={{ base: "sm", md: "md" }}
-                                    >
-                                        Generate Match
-                                        {favorites.size > 0 && (
-                                            <Badge ml={2} colorScheme="green">
-                                                {favorites.size}
-                                            </Badge>
-                                        )}
-                                    </Button>
-                                </HStack>
-                            </VStack>
-                        </Box>
-
-                        <Grid
-                            templateColumns={{
-                                base: '1fr',
-                                sm: 'repeat(2, 1fr)',
-                                lg: 'repeat(3, 1fr)',
-                                xl: 'repeat(4, 1fr)'
-                            }}
-                            gap={{ base: 4, md: 6 }}
-                            width="100%"
-                        >
-                            {dogs.map((dog) => (
-                                <DogCard
-                                    key={dog.id}
-                                    dog={dog}
-                                    isFavorite={favorites.has(dog.id)}
-                                    onToggleFavorite={handleToggleFavorite}
-                                />
-                            ))}
-                        </Grid>
-
-                        {totalPages > 1 && (
-                            <VStack spacing={2} width="100%" py={4}>
-                                <HStack justify="center" spacing={2} wrap="wrap">
-                                    <Button
-                                        onClick={handlePrevPage}
-                                        isDisabled={currentPage === 1 || isLoading}
-                                        size={{ base: "sm", md: "md" }}
-                                    >
-                                        Previous
-                                    </Button>
-                                    <Text>
-                                        Page {currentPage} of {totalPages}
-                                    </Text>
-                                    <Button
-                                        onClick={handleNextPage}
-                                        isDisabled={currentPage === totalPages || isLoading}
-                                        size={{ base: "sm", md: "md" }}
-                                    >
-                                        Next
-                                    </Button>
-                                </HStack>
-                            </VStack>
-                        )}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            isLoading={isLoading}
+                            onPrevPage={handlePrevPage}
+                            onNextPage={handleNextPage}
+                        />
                     </VStack>
                 </Container>
-            }
+            )}
         </Flex>
     );
 };
