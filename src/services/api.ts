@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { Dog, SearchResponse, Match } from '../types';
+import { Dog, Match } from '../types';
 
 const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
@@ -62,3 +62,11 @@ export const generateMatch = async (dogIds: string[]): Promise<Match> => {
     const { data } = await api.post('/dogs/match', dogIds);
     return data;
 };
+
+// Update SearchResponse type
+interface SearchResponse {
+    resultIds: string[];
+    total: number;
+    next: string | null;
+    prev: string | null;
+}
