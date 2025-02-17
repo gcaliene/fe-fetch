@@ -18,6 +18,7 @@ import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { getBreeds, searchDogs, getDogs, logout } from '../services/api';
 import DogCard from '../components/DogCard';
 import { Dog } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface PageInfo {
     next: string | null;
@@ -32,7 +33,7 @@ const Search = () => {
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState();
     const [cursor, setCursor] = useState<string | null>(null);
     const [pageInfo, setPageInfo] = useState<PageInfo>({ next: null, prev: null });
     const [currentPage, setCurrentPage] = useState(1);
@@ -70,12 +71,13 @@ const Search = () => {
                 const dogList = await getDogs(searchResponse.resultIds);
                 setDogs(dogList);
                 setTotalResults(searchResponse.total);
-                
+
                 const nextCursor = searchResponse.next?.split('from=')[1]?.split('&')[0] || null;
                 const prevCursor = searchResponse.prev?.split('from=')[1]?.split('&')[0] || null;
-                
+
                 setPageInfo({ next: nextCursor, prev: prevCursor });
             } catch (error) {
+                console.error('Error fetching dogs:', error);
                 toast({
                     title: 'Error fetching dogs',
                     status: 'error',
@@ -117,6 +119,7 @@ const Search = () => {
             await logout();
             navigate('/');
         } catch (error) {
+            console.error('Logout failed:', error);
             toast({
                 title: 'Logout failed',
                 status: 'error',
@@ -140,93 +143,130 @@ const Search = () => {
     };
 
     return (
-        <Container maxW="container.xl" py={6}>
-            <VStack spacing={6} align="stretch">
-                <Flex justify="space-between" align="center">
-                    <Heading size="lg">Find Your Perfect Dog</Heading>
-                    <Button variant="outline" onClick={handleLogout}>
-                        Logout
-                    </Button>
-                </Flex>
-
-                <Box>
-                    <VStack spacing={4} align="stretch">
-                        <Select
-                            multiple
-                            size="lg"
-                            value={selectedBreeds}
-                            onChange={handleBreedChange}
-                            height="auto"
-                            minHeight="100px"
-                        >
-                            {breeds.map((breed) => (
-                                <option key={breed} value={breed}>
-                                    {breed}
-                                </option>
-                            ))}
-                        </Select>
-
-                        <HStack spacing={4}>
-                            <Button
-                                leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                onClick={handleSortOrderChange}
-                            >
-                                {sortOrder === 'asc' ? 'Sort by Breed (A → Z)' : 'Sort by Breed (Z → A)'}
-                            </Button>
-
-                            <Button
-                                colorScheme="blue"
-                                onClick={handleMatch}
-                                isDisabled={favorites.size === 0}
-                            >
-                                Generate Match
-                                {favorites.size > 0 && (
-                                    <Badge ml={2} colorScheme="green">
-                                        {favorites.size}
-                                    </Badge>
-                                )}
-                            </Button>
-                        </HStack>
-                    </VStack>
-                </Box>
-
-                <Grid
-                    templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }}
-                    gap={6}
+        <Flex
+            minHeight="100vh"
+            width="100vw"
+            align="center"
+            justify="center"
+            bg="gray.50"
+            position="fixed"
+            top="0"
+            left="0"
+        >
+            {isLoading ? <LoadingSpinner message="Fetching dogs..." /> :
+                <Container
+                    maxW="1200px"
+                    py={6}
+                    px={4}
                 >
-                    {dogs.map((dog) => (
-                        <DogCard
-                            key={dog.id}
-                            dog={dog}
-                            isFavorite={favorites.has(dog.id)}
-                            onToggleFavorite={handleToggleFavorite}
-                        />
-                    ))}
-                </Grid>
+                    <VStack spacing={8} align="stretch" width="100%">
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            direction={{ base: "column", md: "row" }}
+                            gap={4}
+                        >
+                            <Heading size="lg">Find Your Perfect Dog</Heading>
+                            <Button variant="outline" onClick={handleLogout}>
+                                Logout
+                            </Button>
+                        </Flex>
 
-                {totalPages > 1 && (
-                    <VStack spacing={2}>
-                        <HStack justify="center" spacing={2}>
-                            <Button
-                                onClick={handlePrevPage}
-                                isDisabled={currentPage === 1 || isLoading}
-                            >
-                                Previous
-                            </Button>
-                            <Text>
-                                Page {currentPage} of {totalPages}
-                            </Text>
-                            <Button
-                                onClick={handleNextPage}
-                                isDisabled={currentPage === totalPages || isLoading}
-                            >
-                                Next
-                            </Button>
-                        </HStack>
+                        <Box width="100%">
+                            <VStack spacing={4} align="stretch">
+                                <Select
+                                    multiple
+                                    size="lg"
+                                    value={selectedBreeds}
+                                    onChange={handleBreedChange}
+                                    height="auto"
+                                    minHeight="100px"
+                                >
+                                    {breeds.map((breed) => (
+                                        <option key={breed} value={breed}>
+                                            {breed}
+                                        </option>
+                                    ))}
+                                </Select>
+
+                                <HStack
+                                    spacing={4}
+                                    wrap="wrap"
+                                    justify={{ base: "center", md: "flex-start" }}
+                                    gap={4}
+                                >
+                                    <Button
+                                        leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                        onClick={handleSortOrderChange}
+                                        size={{ base: "sm", md: "md" }}
+                                    >
+                                        {sortOrder === 'asc' ? 'Sort by Breed (A → Z)' : 'Sort by Breed (Z → A)'}
+                                    </Button>
+
+                                    <Button
+                                        colorScheme="blue"
+                                        onClick={handleMatch}
+                                        isDisabled={favorites.size === 0}
+                                        size={{ base: "sm", md: "md" }}
+                                    >
+                                        Generate Match
+                                        {favorites.size > 0 && (
+                                            <Badge ml={2} colorScheme="green">
+                                                {favorites.size}
+                                            </Badge>
+                                        )}
+                                    </Button>
+                                </HStack>
+                            </VStack>
+                        </Box>
+
+                        <Grid
+                            templateColumns={{
+                                base: '1fr',
+                                sm: 'repeat(2, 1fr)',
+                                lg: 'repeat(3, 1fr)',
+                                xl: 'repeat(4, 1fr)'
+                            }}
+                            gap={{ base: 4, md: 6 }}
+                            width="100%"
+                        >
+                            {dogs.map((dog) => (
+                                <DogCard
+                                    key={dog.id}
+                                    dog={dog}
+                                    isFavorite={favorites.has(dog.id)}
+                                    onToggleFavorite={handleToggleFavorite}
+                                />
+                            ))}
+                        </Grid>
+
+                        {totalPages > 1 && (
+                            <VStack spacing={2} width="100%" py={4}>
+                                <HStack justify="center" spacing={2} wrap="wrap">
+                                    <Button
+                                        onClick={handlePrevPage}
+                                        isDisabled={currentPage === 1 || isLoading}
+                                        size={{ base: "sm", md: "md" }}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Text>
+                                        Page {currentPage} of {totalPages}
+                                    </Text>
+                                    <Button
+                                        onClick={handleNextPage}
+                                        isDisabled={currentPage === totalPages || isLoading}
+                                        size={{ base: "sm", md: "md" }}
+                                    >
+                                        Next
+                                    </Button>
+                                </HStack>
+                            </VStack>
+                        )}
                     </VStack>
-                )}
-            </VStack>
-        </Container>
+                </Container>
+            }
+        </Flex>
     );
 };
 

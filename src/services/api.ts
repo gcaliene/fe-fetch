@@ -64,7 +64,6 @@ export const generateMatch = async (dogIds: string[]): Promise<Match> => {
     return data;
 };
 
-// Update SearchResponse type
 interface SearchResponse {
     resultIds: string[];
     total: number;
