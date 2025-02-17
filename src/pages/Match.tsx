@@ -11,6 +11,9 @@ import {
     Text,
     Spinner,
     Center,
+    Flex,
+    SlideFade,
+    ScaleFade,
 } from '@chakra-ui/react';
 import { generateMatch, getDogs } from '../services/api';
 import { Dog } from '../types';
@@ -42,48 +45,87 @@ const Match = () => {
 
     if (!matchedDog) {
         return (
-            <Center h="100vh">
+            <Center w="100vw" h="100vh">
                 <Spinner size="xl" />
             </Center>
         );
     }
 
     return (
-        <Container maxW="container.sm" py={10}>
-            <Stack spacing={6} align="center">
-                <Heading>Your Perfect Match!</Heading>
-                <Card maxW="500px" w="100%">
-                    <Image
-                        src={matchedDog.img}
-                        alt={matchedDog.name}
-                        height="300px"
-                        objectFit="cover"
-                    />
-                    <CardBody>
-                        <Stack spacing={3}>
-                            <Heading size="md">Meet {matchedDog.name}!</Heading>
-                            <Text>
-                                <strong>Breed:</strong> {matchedDog.breed}
-                            </Text>
-                            <Text>
-                                <strong>Age:</strong> {matchedDog.age} years
-                            </Text>
-                            <Text>
-                                <strong>Location:</strong> {matchedDog.zip_code}
-                            </Text>
-                        </Stack>
-                    </CardBody>
-                </Card>
+        <Flex 
+            minHeight="100vh"
+            width="100vw"
+            align="center"
+            justify="center"
+            bg="gray.50"
+        >
+            <Container maxW="container.sm" py={10}>
+                <ScaleFade initialScale={0.9} in={true}>
+                    <Stack spacing={8} align="center">
+                        <Heading 
+                            size="xl" 
+                            textAlign="center"
+                            bgGradient="linear(to-r, blue.400, purple.500)"
+                            bgClip="text"
+                        >
+                            Your Perfect Match!
+                        </Heading>
+                        
+                        <Card 
+                            maxW="500px" 
+                            w="100%" 
+                            boxShadow="xl"
+                            borderRadius="lg"
+                            overflow="hidden"
+                        >
+                            <SlideFade in={true} offsetY="20px">
+                                <Image
+                                    src={matchedDog.img}
+                                    alt={matchedDog.name}
+                                    height={{ base: "300px", md: "400px" }}
+                                    width="100%"
+                                    objectFit="cover"
+                                    objectPosition="center"
+                                />
+                                <CardBody py={{ base: 4, md: 6 }}>
+                                    <Stack spacing={{ base: 3, md: 4 }} align="center" textAlign="center">
+                                        <Heading 
+                                            size="md"
+                                            color="blue.600"
+                                        >
+                                            Meet {matchedDog.name}!
+                                        </Heading>
+                                        <Text fontSize={{ base: "md", md: "lg" }}>
+                                            <strong>Breed:</strong> {matchedDog.breed}
+                                        </Text>
+                                        <Text fontSize={{ base: "md", md: "lg" }}>
+                                            <strong>Age:</strong> {matchedDog.age} years
+                                        </Text>
+                                        <Text fontSize={{ base: "md", md: "lg" }}>
+                                            <strong>Location:</strong> {matchedDog.zip_code}
+                                        </Text>
+                                    </Stack>
+                                </CardBody>
+                            </SlideFade>
+                        </Card>
 
-                <Button
-                    colorScheme="blue"
-                    size="lg"
-                    onClick={() => navigate('/search')}
-                >
-                    Back to Search
-                </Button>
-            </Stack>
-        </Container>
+                        <Button
+                            colorScheme="blue"
+                            size="lg"
+                            onClick={() => navigate('/search')}
+                            boxShadow="md"
+                            _hover={{
+                                transform: 'translateY(-2px)',
+                                boxShadow: 'lg',
+                            }}
+                            transition="all 0.2s"
+                        >
+                            Back to Search
+                        </Button>
+                    </Stack>
+                </ScaleFade>
+            </Container>
+        </Flex>
     );
 };
 
