@@ -6,6 +6,7 @@ interface DogGridProps {
     dogs: Dog[];
     favorites: Set<string>;
     onToggleFavorite: (dogId: string) => void;
+    isLoading: boolean;
 }
 
 const DogGrid = ({ dogs, favorites, onToggleFavorite }: DogGridProps) => {
