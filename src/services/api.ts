@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { Dog, Match } from '../types';
+import { BASE_PATH } from './constants';
 
 const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
@@ -15,7 +16,7 @@ api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         if (error.response?.status === 401) {
-            window.location.href = '/login';
+            window.location.href = `${BASE_PATH}/`;
         }
         return Promise.reject(error);
     }
