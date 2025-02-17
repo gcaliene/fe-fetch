@@ -14,6 +14,9 @@ interface SearchControlsProps {
     onGenerateMatch: () => void;
     onAgeRangeChange: (range: [number, number]) => void;
     onZipCodeChange: (zipCode: string) => void;
+    onResetFilters: () => void;
+    onResetFavorites: () => void;
+    isFiltersModified: boolean;
 }
 
 const SearchControls = ({
@@ -28,7 +31,10 @@ const SearchControls = ({
     onSortOrderChange,
     onGenerateMatch,
     onAgeRangeChange,
-    onZipCodeChange
+    onZipCodeChange,
+    onResetFilters,
+    onResetFavorites,
+    isFiltersModified
 }: SearchControlsProps) => {
     const hasNonDigits = /\D/.test(zipCode);
 
@@ -62,12 +68,30 @@ const SearchControls = ({
                         isDisabled={favoritesCount === 0 || isLoading}
                         size={{ base: "sm", md: "md" }}
                     >
-                        Generate Match
+                        Generate Match With Favorites
                         {favoritesCount > 0 && (
                             <Badge ml={2} colorScheme="green">
                                 {favoritesCount}
                             </Badge>
                         )}
+                    </Button>
+
+                    <Button
+                        colorScheme="red"
+                        variant="outline"
+                        onClick={onResetFavorites}
+                        size={{ base: "sm", md: "md" }}
+                        isDisabled={favoritesCount === 0 || isLoading}
+                    >
+                        Reset Favorites
+                    </Button>
+                    <Button
+                        colorScheme="red"
+                        onClick={onResetFilters}
+                        size={{ base: "sm", md: "md" }}
+                        isDisabled={isLoading || !isFiltersModified}
+                    >
+                        Reset Filters
                     </Button>
                 </HStack>
 

@@ -14,6 +14,10 @@ interface PageInfo {
     prev: string | null;
 }
 
+// Add these constants for default values
+const DEFAULT_AGE_RANGE: [number, number] = [0, 20];
+const DEFAULT_ZIP = '';
+
 const Search = () => {
     const navigate = useNavigate();
     const toast = useToast();
@@ -164,6 +168,27 @@ const Search = () => {
         }
     };
 
+    const handleResetFilters = () => {
+        setSelectedBreeds([]);
+        setAgeRange([0, 20]);
+        setZipCode('');
+        setCursor(null);
+        setCurrentPage(1);
+    };
+
+    const handleResetFavorites = () => {
+        setFavorites(new Set());
+    };
+
+    // Add a function to check if filters are modified
+    const areFiltersModified = () => {
+        const isAgeRangeModified = ageRange[0] !== DEFAULT_AGE_RANGE[0] || ageRange[1] !== DEFAULT_AGE_RANGE[1];
+        const areBreedsModified = selectedBreeds.length > 0;
+        const isZipModified = zipCode !== DEFAULT_ZIP;
+
+        return isAgeRangeModified || areBreedsModified || isZipModified;
+    };
+
     if (isInitialLoading) {
         return <LoadingSpinner message="Loading..." />;
     }
@@ -195,6 +220,9 @@ const Search = () => {
                                 isLoading={isSearching}
                                 zipCode={zipCode}
                                 onZipCodeChange={handleZipCodeChange}
+                                onResetFilters={handleResetFilters}
+                                onResetFavorites={handleResetFavorites}
+                                isFiltersModified={areFiltersModified()}
                             />
                         </Box>
 
