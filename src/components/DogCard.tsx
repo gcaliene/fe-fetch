@@ -1,5 +1,5 @@
 import { Card, CardBody, Image, Stack, Heading, Text, IconButton } from '@chakra-ui/react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaPaw } from 'react-icons/fa';
 import { Dog } from '../types';
 
 interface DogCardProps {
@@ -19,14 +19,14 @@ const DogCard = ({ dog, isFavorite, onToggleFavorite }: DogCardProps) => {
             />
             <IconButton
                 aria-label="Favorite"
-                icon={isFavorite ? <FaHeart /> : <FaRegHeart />}
+                icon={isFavorite ? <FaPaw /> : <FaPaw />}
                 position="absolute"
                 top={2}
                 right={2}
                 colorScheme="red"
                 onClick={() => onToggleFavorite(dog.id)}
                 bg={isFavorite ? "red.500" : "white"}
-                color={isFavorite ? "white" : "red.500"}
+                color={isFavorite ? "white" : "grey"}
                 opacity={0.8}
                 _hover={{ 
                     opacity: 1,
