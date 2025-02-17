@@ -166,7 +166,7 @@ const Search = () => {
                                 leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                 onClick={handleSortOrderChange}
                             >
-                                Sort by Breed
+                                {sortOrder === 'asc' ? 'Sort by Breed (A → Z)' : 'Sort by Breed (Z → A)'}
                             </Button>
 
                             <Button
