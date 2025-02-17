@@ -19,6 +19,11 @@ import { getBreeds, searchDogs, getDogs, logout } from '../services/api';
 import DogCard from '../components/DogCard';
 import { Dog } from '../types';
 
+interface PageInfo {
+    next: string | null;
+    prev: string | null;
+}
+
 const Search = () => {
     const navigate = useNavigate();
     const toast = useToast();
@@ -29,7 +34,7 @@ const Search = () => {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [isLoading, setIsLoading] = useState(false);
     const [cursor, setCursor] = useState<string | null>(null);
-    const [pageInfo, setPageInfo] = useState({ next: null, prev: null });
+    const [pageInfo, setPageInfo] = useState<PageInfo>({ next: null, prev: null });
     const [currentPage, setCurrentPage] = useState(1);
     const [totalResults, setTotalResults] = useState(0);
 
