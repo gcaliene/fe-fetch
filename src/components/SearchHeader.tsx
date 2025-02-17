@@ -1,4 +1,5 @@
-import { Flex, Heading, Button } from '@chakra-ui/react';
+import { Flex, Heading, Button, IconButton } from '@chakra-ui/react';
+import { FiLogOut } from 'react-icons/fi';
 
 interface SearchHeaderProps {
     onLogout: () => Promise<void>;
@@ -9,12 +10,21 @@ const SearchHeader = ({ onLogout }: SearchHeaderProps) => {
         <Flex
             justify="space-between"
             align="center"
-            direction={{ base: "column", md: "row" }}
-            gap={4}
             width="100%"
         >
             <Heading size="lg">Find Your Perfect Dog</Heading>
-            <Button variant="outline" onClick={onLogout}>
+            <IconButton
+                aria-label="Logout"
+                icon={<FiLogOut />}
+                variant="outline"
+                onClick={onLogout}
+                display={{ base: "flex", md: "none" }}
+            />
+            <Button 
+                variant="outline" 
+                onClick={onLogout}
+                display={{ base: "none", md: "flex" }}
+            >
                 Logout
             </Button>
         </Flex>
