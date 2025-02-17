@@ -22,7 +22,8 @@ const Search = () => {
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [cursor, setCursor] = useState<string | null>(null);
     const [pageInfo, setPageInfo] = useState<PageInfo>({ next: null, prev: null });
     const [currentPage, setCurrentPage] = useState(1);
@@ -42,6 +43,8 @@ const Search = () => {
                     status: 'error',
                     duration: 3000,
                 });
+            } finally {
+                setIsInitialLoading(false);
             }
         };
         fetchBreeds();
@@ -49,7 +52,7 @@ const Search = () => {
 
     useEffect(() => {
         const fetchDogs = async () => {
-            setIsLoading(true);
+            setIsSearching(true);
             try {
                 const searchResponse = await searchDogs({
                     breeds: selectedBreeds,
@@ -60,10 +63,10 @@ const Search = () => {
                 const dogList = await getDogs(searchResponse.resultIds);
                 setDogs(dogList);
                 setTotalResults(searchResponse.total);
-
+                
                 const nextCursor = searchResponse.next?.split('from=')[1]?.split('&')[0] || null;
                 const prevCursor = searchResponse.prev?.split('from=')[1]?.split('&')[0] || null;
-
+                
                 setPageInfo({ next: nextCursor, prev: prevCursor });
             } catch (error) {
                 console.error('Error fetching dogs:', error);
@@ -72,15 +75,22 @@ const Search = () => {
                     status: 'error',
                 });
             } finally {
-                setIsLoading(false);
+                setIsSearching(false);
             }
         };
         fetchDogs();
     }, [selectedBreeds, sortOrder, cursor, toast]);
 
     const handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const values = Array.from(event.target.selectedOptions, option => option.value);
-        setSelectedBreeds(values);
+        // Create an array from the select's options
+        const selectedOptions = Array.from(event.target.selectedOptions);
+        // Map the selected options to their values
+        const selectedValues = selectedOptions.map(option => option.value);
+        
+        // Update selected breeds
+        setSelectedBreeds(selectedValues);
+        
+        // Reset pagination when breeds change
         setCursor(null);
         setCurrentPage(1);
     };
@@ -131,6 +141,10 @@ const Search = () => {
         setCurrentPage(prev => prev - 1);
     };
 
+    if (isInitialLoading) {
+        return <LoadingSpinner message="Loading..." />;
+    }
+
     return (
         <Flex
             minHeight="100vh"
@@ -139,37 +153,37 @@ const Search = () => {
             justify="center"
             bg="gray.50"
         >
-            {isLoading ? <LoadingSpinner message="Fetching dogs..." /> : (
-                <Container maxW="1200px" py={6} px={4}>
-                    <VStack spacing={8} align="stretch" width="100%">
-                        <SearchHeader onLogout={handleLogout} />
-                        
-                        <SearchControls
-                            breeds={breeds}
-                            selectedBreeds={selectedBreeds}
-                            sortOrder={sortOrder}
-                            favoritesCount={favorites.size}
-                            onBreedChange={handleBreedChange}
-                            onSortOrderChange={handleSortOrderChange}
-                            onGenerateMatch={handleMatch}
-                        />
+            <Container maxW="1200px" py={6} px={4}>
+                <VStack spacing={8} align="stretch" width="100%">
+                    <SearchHeader onLogout={handleLogout} />
+                    
+                    <SearchControls
+                        breeds={breeds}
+                        selectedBreeds={selectedBreeds}
+                        sortOrder={sortOrder}
+                        favoritesCount={favorites.size}
+                        onBreedChange={handleBreedChange}
+                        onSortOrderChange={handleSortOrderChange}
+                        onGenerateMatch={handleMatch}
+                        isLoading={isSearching}
+                    />
 
-                        <DogGrid
-                            dogs={dogs}
-                            favorites={favorites}
-                            onToggleFavorite={handleToggleFavorite}
-                        />
+                    <DogGrid
+                        dogs={dogs}
+                        favorites={favorites}
+                        onToggleFavorite={handleToggleFavorite}
+                        isLoading={isSearching}
+                    />
 
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            isLoading={isLoading}
-                            onPrevPage={handlePrevPage}
-                            onNextPage={handleNextPage}
-                        />
-                    </VStack>
-                </Container>
-            )}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        isLoading={isSearching}
+                        onPrevPage={handlePrevPage}
+                        onNextPage={handleNextPage}
+                    />
+                </VStack>
+            </Container>
         </Flex>
     );
 };

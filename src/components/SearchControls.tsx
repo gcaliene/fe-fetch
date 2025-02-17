@@ -6,6 +6,7 @@ interface SearchControlsProps {
     selectedBreeds: string[];
     sortOrder: 'asc' | 'desc';
     favoritesCount: number;
+    isLoading: boolean;
     onBreedChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     onSortOrderChange: () => void;
     onGenerateMatch: () => void;
@@ -16,6 +17,7 @@ const SearchControls = ({
     selectedBreeds,
     sortOrder,
     favoritesCount,
+    isLoading,
     onBreedChange,
     onSortOrderChange,
     onGenerateMatch
@@ -30,9 +32,24 @@ const SearchControls = ({
                     onChange={onBreedChange}
                     height="auto"
                     minHeight="100px"
+                    isDisabled={isLoading}
+                    sx={{
+                        '& option:checked': {
+                            backgroundColor: 'blue.500',
+                            color: 'white'
+                        },
+                        '& option': {
+                            padding: '8px',
+                            margin: '2px'
+                        }
+                    }}
                 >
                     {breeds.map((breed) => (
-                        <option key={breed} value={breed}>
+                        <option 
+                            key={breed} 
+                            value={breed}
+                            selected={selectedBreeds.includes(breed)}
+                        >
                             {breed}
                         </option>
                     ))}
@@ -48,6 +65,7 @@ const SearchControls = ({
                         leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
                         onClick={onSortOrderChange}
                         size={{ base: "sm", md: "md" }}
+                        isDisabled={isLoading}
                     >
                         {sortOrder === 'asc' ? 'Sort by Breed (A → Z)' : 'Sort by Breed (Z → A)'}
                     </Button>
@@ -55,7 +73,7 @@ const SearchControls = ({
                     <Button
                         colorScheme="blue"
                         onClick={onGenerateMatch}
-                        isDisabled={favoritesCount === 0}
+                        isDisabled={favoritesCount === 0 || isLoading}
                         size={{ base: "sm", md: "md" }}
                     >
                         Generate Match
