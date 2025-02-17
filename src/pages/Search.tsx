@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, VStack, Flex, useToast } from '@chakra-ui/react';
+import { Container, VStack, Flex, useToast, Box } from '@chakra-ui/react';
 import { getBreeds, searchDogs, getDogs, logout } from '../services/api';
 import { Dog } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -157,31 +157,37 @@ const Search = () => {
                 <VStack spacing={8} align="stretch" width="100%">
                     <SearchHeader onLogout={handleLogout} />
                     
-                    <SearchControls
-                        breeds={breeds}
-                        selectedBreeds={selectedBreeds}
-                        sortOrder={sortOrder}
-                        favoritesCount={favorites.size}
-                        onBreedChange={handleBreedChange}
-                        onSortOrderChange={handleSortOrderChange}
-                        onGenerateMatch={handleMatch}
-                        isLoading={isSearching}
-                    />
+                    <Flex direction={{ base: "column", lg: "row" }} gap={6}>
+                        <Box width={{ base: "100%", lg: "300px" }} flexShrink={0}>
+                            <SearchControls
+                                breeds={breeds}
+                                selectedBreeds={selectedBreeds}
+                                sortOrder={sortOrder}
+                                favoritesCount={favorites.size}
+                                onBreedChange={handleBreedChange}
+                                onSortOrderChange={handleSortOrderChange}
+                                onGenerateMatch={handleMatch}
+                                isLoading={isSearching}
+                            />
+                        </Box>
 
-                    <DogGrid
-                        dogs={dogs}
-                        favorites={favorites}
-                        onToggleFavorite={handleToggleFavorite}
-                        isLoading={isSearching}
-                    />
+                        <Box flex={1}>
+                            <DogGrid
+                                dogs={dogs}
+                                favorites={favorites}
+                                onToggleFavorite={handleToggleFavorite}
+                                isLoading={isSearching}
+                            />
 
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        isLoading={isSearching}
-                        onPrevPage={handlePrevPage}
-                        onNextPage={handleNextPage}
-                    />
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                isLoading={isSearching}
+                                onPrevPage={handlePrevPage}
+                                onNextPage={handleNextPage}
+                            />
+                        </Box>
+                    </Flex>
                 </VStack>
             </Container>
         </Flex>

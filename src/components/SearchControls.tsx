@@ -23,16 +23,22 @@ const SearchControls = ({
     onGenerateMatch
 }: SearchControlsProps) => {
     return (
-        <Box width="100%">
-            <VStack spacing={4} align="stretch">
+        <Box 
+            width="100%" 
+            height={{ base: "auto", lg: "calc(100vh - 100px)" }}
+            position="sticky"
+            top="20px"
+        >
+            <VStack spacing={4} align="stretch" height="100%">
                 <Select
                     multiple
                     size="lg"
                     value={selectedBreeds}
                     onChange={onBreedChange}
-                    height="auto"
+                    height={{ base: "auto", lg: "calc(100vh - 200px)" }}
                     minHeight="100px"
                     isDisabled={isLoading}
+                    order={{ base: 1, lg: 2 }}
                     sx={{
                         '& option:checked': {
                             backgroundColor: 'blue.500',
@@ -60,6 +66,7 @@ const SearchControls = ({
                     wrap="wrap"
                     justify={{ base: "center", md: "flex-start" }}
                     gap={4}
+                    order={{ base: 2, lg: 1 }}
                 >
                     <Button
                         leftIcon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
