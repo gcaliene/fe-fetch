@@ -8,7 +8,7 @@ import Match from './pages/Match';
 function App() {
   return (
     <ChakraProvider>
-      <Router>
+      <Router basename="/fe-fetch">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/search" element={
