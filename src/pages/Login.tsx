@@ -58,8 +58,33 @@ const Login = () => {
             position="fixed"
             top="0"
             left="0"
+            direction={isMobile ? "column" : "row"}
         >
-            {/* Left Section - Hidden on mobile */}
+            {/* Background Image - Full screen on mobile */}
+            {isMobile && (
+                <Box
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    right="0"
+                    bottom="0"
+                    bgImage="url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b')"
+                    bgSize="cover"
+                    bgPosition="center"
+                    filter="blur(2px)"
+                    _after={{
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bg: 'whiteAlpha.700',
+                    }}
+                />
+            )}
+
+            {/* Desktop Left Section */}
             {!isMobile && (
                 <Flex
                     flex="1"
@@ -111,80 +136,109 @@ const Login = () => {
                 </Flex>
             )}
 
-            {/* Right Section - Form */}
+            {/* Content Section */}
             <Flex 
                 flex={isMobile ? "1" : "1"}
                 align="center"
                 justify="center"
-                bg="white"
+                bg={isMobile ? "transparent" : "white"}
+                zIndex="1"
             >
                 <Box
                     p="8"
                     width={isMobile ? "90%" : "full"}
                     maxWidth="500px"
                 >
-                    <Stack spacing="6">
+                    <Stack spacing="4">
+                        {/* Mobile Hero Content */}
                         {isMobile && (
-                            <HStack justify="center" spacing="3">
-                                <Heading size="xl">
-                                    Dog Fetcher
-                                </Heading>
-                                <Icon as={FaPaw} w={8} h={8} />
-                            </HStack>
+                            <Stack spacing="6" textAlign="center">
+                                <HStack justify="center" spacing="3">
+                                    <Heading size="xl" color="gray.800">
+                                        Dog Fetcher
+                                    </Heading>
+                                    <Icon as={FaPaw} w={8} h={8} color="gray.800" />
+                                </HStack>
+                                <Text fontSize="lg" fontWeight="medium" color="gray.700">
+                                    Welcome to the ultimate platform for finding your ideal canine companion. 
+                                    Our intelligent matching system helps connect you with dogs that perfectly 
+                                    fit your lifestyle and preferences.
+                                </Text>
+                            </Stack>
                         )}
-                        
-                        <Stack spacing="4" align="center">
-                            <Heading size="lg">Welcome Back</Heading>
-                            <Text color="gray.600">
-                                Please sign in to continue
-                            </Text>
-                        </Stack>
-                        
-                        <Formik
-                            initialValues={{ name: '', email: '' }}
-                            validationSchema={validationSchema}
-                            onSubmit={handleSubmit}
+
+                        {/* Login Form Section */}
+                        <Stack 
+                            spacing="6" 
+                            bg="transparent"
+                            p={isMobile ? 6 : 0}
+                            borderRadius="lg"
                         >
-                            {({ values, errors, touched, handleChange, isSubmitting, }) => (
-                                <Form>
-                                    <Stack spacing="4">
-                                        <FormControl isInvalid={!!errors.name && touched.name}>
-                                            <FormLabel>Name</FormLabel>
-                                            <Input
-                                                name="name"
-                                                value={values.name}
-                                                onChange={handleChange}
-                                                size="lg"
-                                            />
-                                            <FormErrorMessage>{errors.name}</FormErrorMessage>
-                                        </FormControl>
+                            <Stack spacing="4" align="center">
+                                <Heading size="lg" color="gray.800">Welcome Back</Heading>
+                                <Text color="gray.600">
+                                    Please sign in to continue
+                                </Text>
+                            </Stack>
+                            
+                            <Formik
+                                initialValues={{ name: '', email: '' }}
+                                validationSchema={validationSchema}
+                                onSubmit={handleSubmit}
+                            >
+                                {({ values, errors, touched, handleChange, isSubmitting, }) => (
+                                    <Form>
+                                        <Stack spacing="4">
+                                            <FormControl isInvalid={!!errors.name && touched.name}>
+                                                <FormLabel>Name</FormLabel>
+                                                <Input
+                                                    name="name"
+                                                    value={values.name}
+                                                    onChange={handleChange}
+                                                    size="lg"
+                                                    borderColor="gray.400"
+                                                    _hover={{ borderColor: "gray.500" }}
+                                                    _focus={{ 
+                                                        borderColor: "gray.700",
+                                                        boxShadow: "0 0 0 1px rgba(45, 55, 72, 0.6)"
+                                                    }}
+                                                />
+                                                <FormErrorMessage>{errors.name}</FormErrorMessage>
+                                            </FormControl>
 
-                                        <FormControl isInvalid={!!errors.email && touched.email}>
-                                            <FormLabel>Email</FormLabel>
-                                            <Input
-                                                name="email"
-                                                type="email"
-                                                value={values.email}
-                                                onChange={handleChange}
-                                                size="lg"
-                                            />
-                                            <FormErrorMessage>{errors.email}</FormErrorMessage>
-                                        </FormControl>
+                                            <FormControl isInvalid={!!errors.email && touched.email}>
+                                                <FormLabel>Email</FormLabel>
+                                                <Input
+                                                    name="email"
+                                                    type="email"
+                                                    value={values.email}
+                                                    onChange={handleChange}
+                                                    size="lg"
+                                                    borderColor="gray.400"
+                                                    _hover={{ borderColor: "gray.500" }}
+                                                    _focus={{ 
+                                                        borderColor: "gray.700",
+                                                        boxShadow: "0 0 0 1px rgba(45, 55, 72, 0.6)"
+                                                    }}
+                                                />
+                                                <FormErrorMessage>{errors.email}</FormErrorMessage>
+                                            </FormControl>
 
-                                        <Button
-                                            mt="2"
-                                            size="lg"
-                                            width="full"
-                                            colorScheme="blue"
-                                            isLoading={isSubmitting}
-                                            type="submit"
-                                        >
-                                            Login
-                                        </Button>
-                                    </Stack>
-                                </Form>
-                            )}
-                        </Formik>
+                                            <Button
+                                                mt="2"
+                                                size="lg"
+                                                width="full"
+                                                colorScheme="blue"
+                                                isLoading={isSubmitting}
+                                                type="submit"
+                                            >
+                                                Login
+                                            </Button>
+                                        </Stack>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </Stack>
                     </Stack>
                 </Box>
             </Flex>
